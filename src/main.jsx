@@ -1,10 +1,24 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import App from './App.jsx'
-import './index.css'
+const plus = document.getElementById("add");
+const minus = document.getElementById("minus");
+const number = document.querySelector("span");
 
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+let count = 0;
+
+number.innerText = count;
+
+const updateText = () => {
+  number.innerText = count;
+}
+
+const handleAdd = () => {
+  count++;
+  updateText();
+}
+
+const handleMinus = () => {
+  count--;
+  updateText();
+}
+
+plus.addEventListener("click",handleAdd);
+minus.addEventListener("click",handleMinus);
