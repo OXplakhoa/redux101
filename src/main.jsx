@@ -1,42 +1,83 @@
 import { configureStore } from "@reduxjs/toolkit";
 
-const plus = document.getElementById("add");
-const neg = document.getElementById("minus");
-const span = document.querySelector("span");
-span.innerText = 0;
+const form = document.querySelector("form");
+const input = document.querySelector("input");
+const ul = document.querySelector("ul")
 
-const add = "add";
-const minus = "minus";
+const ADD = "add";
+const DELETE = "delete";
 
-const handleCount = (count = 0,action) => {
-  switch (action.type) {
-    case add:
-      return count+1;
-    case minus:
-      return count-1;
-    default:
-      return count;
+const handleAdd = (text) => {
+  return {
+    type: ADD,
+    text
   }
 }
 
-const countStore = configureStore({
+const handleDelete = (id) => {
+  return {
+    type: DELETE,
+    id
+  }
+}
+
+const handleReducer = (state = [],action) => {
+  switch(action.type){
+    case ADD:
+      return [{text: action.text, id: Date.now() },...state];
+    case DELETE:
+      return [];
+    default:
+      return state;
+  }
+};
+
+const store = configureStore({
   reducer: {
-    c: handleCount
+    state: handleReducer
   }
 })
 
-const onChange = () => {
-  span.innerText = countStore.getState().c;
+const addTodo = (text) => {
+  store.dispatch(handleAdd(text))
+}
+const deleteTodo = (e) => {
+  const id = e.target.parentNode.id;
+  store.dispatch(handleDelete(id))
 }
 
-countStore.subscribe(onChange)
+store.subscribe(() => console.log(store.getState().state))
 
-const handleAdd = () => {
-  countStore.dispatch({type: add})
-}
-const handleMinus = () => {
-  countStore.dispatch({type: minus})
+const paintTodos = () => {
+  ul.innerHTML = ""
+  const toDos = store.getState().state;
+  toDos.forEach((todo) => {
+    const li = document.createElement("li");
+    const btn = document.createElement("button");
+    btn.innerText = "❌";
+    btn.addEventListener("click",deleteTodo)
+    li.id = todo.id;
+    li.innerText = todo.text;
+    li.appendChild(btn);
+    ul.appendChild(li);
+  })
 }
 
-plus.addEventListener("click",handleAdd);
-neg.addEventListener("click",handleMinus);
+store.subscribe(paintTodos);
+
+
+
+const createTodo = (toDo) => {
+  const li = document.createElement("li");
+  li.innerText = toDo;
+  ul.appendChild(li);
+}
+
+const handleSubmit = (e) => {
+  e.preventDefault();
+  const toDo = input.value;
+  addTodo(toDo);
+  input.value = "";
+}
+
+form.addEventListener("submit",handleSubmit);
