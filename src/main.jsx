@@ -26,7 +26,7 @@ const handleReducer = (state = [],action) => {
     case ADD:
       return [{text: action.text, id: Date.now() },...state];
     case DELETE:
-      return [];
+      return state.filter(toDo => toDo.id !== action.id)
     default:
       return state;
   }
@@ -42,7 +42,7 @@ const addTodo = (text) => {
   store.dispatch(handleAdd(text))
 }
 const deleteTodo = (e) => {
-  const id = e.target.parentNode.id;
+  const id = parseInt(e.target.parentNode.id);
   store.dispatch(handleDelete(id))
 }
 
@@ -64,14 +64,6 @@ const paintTodos = () => {
 }
 
 store.subscribe(paintTodos);
-
-
-
-const createTodo = (toDo) => {
-  const li = document.createElement("li");
-  li.innerText = toDo;
-  ul.appendChild(li);
-}
 
 const handleSubmit = (e) => {
   e.preventDefault();
