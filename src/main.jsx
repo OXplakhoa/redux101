@@ -1,11 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
-
+import { v4 as uuidv4 } from 'uuid';
 const form = document.querySelector("form");
 const input = document.querySelector("input");
-const ul = document.querySelector("ul")
+const ul = document.querySelector("ul");
 
-const ADD = "add";
-const DELETE = "delete";
+const ADD = "ADD";
+const DELETE =  "DELETE";
 
 const handleAdd = (text) => {
   return {
@@ -22,53 +22,54 @@ const handleDelete = (id) => {
 }
 
 const handleReducer = (state = [],action) => {
-  switch(action.type){
+  switch (action.type) {
     case ADD:
-      return [{text: action.text, id: Date.now() },...state];
+      return [{text: action.text, id: uuidv4()}]
     case DELETE:
-      return state.filter(toDo => toDo.id !== action.id)
+      return state.filter((todo) => todo.id !== action.id);
     default:
-      return state;
+      return state
   }
-};
+}
 
 const store = configureStore({
   reducer: {
-    state: handleReducer
+    ToDoList: handleReducer
   }
 })
 
-const addTodo = (text) => {
-  store.dispatch(handleAdd(text))
-}
-const deleteTodo = (e) => {
-  const id = parseInt(e.target.parentNode.id);
-  store.dispatch(handleDelete(id))
+const addToDo = (text) => {
+  store.dispatch(handleAdd(text));
 }
 
-store.subscribe(() => console.log(store.getState().state))
+const deleteToDo = (e) => {
+  const id = e.target.parentNode.id;
+  store.dispatch(handleDelete(id));
+}
 
-const paintTodos = () => {
-  ul.innerHTML = ""
-  const toDos = store.getState().state;
+store.subscribe(() => console.log(store.getState().ToDoList))
+
+const ToDo = () => {
+  ul.innerHTML = "";
+  const toDos = store.getState().ToDoList;
   toDos.forEach((todo) => {
     const li = document.createElement("li");
     const btn = document.createElement("button");
-    btn.innerText = "❌";
-    btn.addEventListener("click",deleteTodo)
-    li.id = todo.id;
+    btn.innerText = "✖️";
+    btn.addEventListener("click",deleteToDo);
     li.innerText = todo.text;
+    li.id = todo.id;
     li.appendChild(btn);
     ul.appendChild(li);
-  })
+  }) 
 }
 
-store.subscribe(paintTodos);
+store.subscribe(ToDo);
 
 const handleSubmit = (e) => {
   e.preventDefault();
   const toDo = input.value;
-  addTodo(toDo);
+  addToDo(toDo);
   input.value = "";
 }
 
