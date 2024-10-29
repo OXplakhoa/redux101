@@ -24,7 +24,7 @@ const handleDelete = (id) => {
 const handleReducer = (state = [],action) => {
   switch (action.type) {
     case ADD:
-      return [{text: action.text, id: uuidv4()}]
+      return [{text: action.text, id: uuidv4()},...state]
     case DELETE:
       return state.filter((todo) => todo.id !== action.id);
     default:
