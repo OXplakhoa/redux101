@@ -1,21 +1,21 @@
 import { useState } from "react";
 import { connect } from "react-redux";
+import { actionCreators } from "../store";
 
-const Home = ({ toDos }) => {
-    console.log(toDos);
+const Home = ({ toDos, addToDo }) => { 
     const [text, setText] = useState("");
-    
+
     const onChange = (e) => {
         setText(e.target.value);
-    }
-    
+    };
+
     const onSubmit = (e) => {
         e.preventDefault();
         console.log(text);
-        // Here you might want to dispatch an action to add the new toDo
+        addToDo(text); 
         setText("");
-    }
-    
+    };
+
     return (
         <div>
             <h1>TODO !</h1>
@@ -30,14 +30,20 @@ const Home = ({ toDos }) => {
                 <button type="submit">Add</button>
             </form>
             <ul>
-                {JSON.stringify(toDos.state)}
+                {JSON.stringify(toDos)}
             </ul>
         </div>
-    )
-}
+    );
+};
 
 const mapStateToProps = (state) => {
-    return { toDos: state }
-}
+    return { toDos: state }; 
+};
 
-export default connect(mapStateToProps)(Home);
+const mapDispatchToProps = (dispatch) => {
+    return {
+        addToDo: (text) => dispatch(actionCreators.addToDo(text)) 
+    };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Home);
