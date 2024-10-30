@@ -37,4 +37,3 @@ export const actionCreators = {
     addToDo,
     deleteToDo
 };
-
