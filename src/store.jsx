@@ -1,39 +1,80 @@
 import { configureStore } from "@reduxjs/toolkit";
+import {
+    persistStore,
+    persistReducer,
+    FLUSH,
+    REHYDRATE,
+    PAUSE,
+    PERSIST,
+    PURGE,
+    REGISTER,
+} from 'redux-persist';
+import storage from "redux-persist/lib/storage";
 import { v4 as uuidv4 } from "uuid";
 
 const ADD = "ADD";
 const DELETE = "DELETE";
 
-const addToDo = (text) => {
-    return {
-        type: ADD,
-        text
-    };
+// Action creators
+const addToDo = (text) => ({
+    type: ADD,
+    text,
+});
+
+const deleteToDo = (id) => ({
+    type: DELETE,
+    id,
+});
+
+// Initial state
+const initialState = {
+    todos: [], 
 };
 
-const deleteToDo = (id) => {
-    return {
-        type: DELETE,
-        id
-    };
-};
-
-const handleReducer = (state = [], action) => {
+// Reducer
+const handleReducer = (state = initialState, action) => {
     switch (action.type) {
         case ADD:
-            return [{ text: action.text, id: uuidv4() }, ...state];
+            if (!action.text || action.text.trim() === "") return state; // Avoid adding empty todos
+            return {
+                ...state,
+                todos: [{ text: action.text, id: uuidv4() }, ...state.todos],
+            };
         case DELETE:
-            return state.filter((s) => s.id !== action.id);
+            return {
+                ...state,
+                todos: state.todos.filter((todo) => todo.id !== action.id),
+            };
         default:
             return state;
     }
 };
 
+// Persist configuration
+const persistConfig = {
+    key: 'root',
+    version: 1,
+    storage,
+};
+
+// Persisted reducer
+const persistedReducer = persistReducer(persistConfig, handleReducer);
+
+// Configure store
 export const store = configureStore({
-    reducer: handleReducer
+    reducer: persistedReducer,
+    middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware({
+            serializableCheck: {
+                ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+            },
+        }),
 });
 
+export const persistor = persistStore(store);
+
+// Export action creators
 export const actionCreators = {
     addToDo,
-    deleteToDo
+    deleteToDo,
 };
