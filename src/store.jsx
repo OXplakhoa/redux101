@@ -1,3 +1,4 @@
+import { composeWithDevTools } from "@redux-devtools/extension";
 import { configureStore, createAction, createReducer } from "@reduxjs/toolkit";
 import { v4 as uuidv4 } from "uuid";
 
@@ -27,7 +28,10 @@ const handleReducer = createReducer([],(builder) => {
 })
 
 export const store = configureStore({
-    reducer: handleReducer
+    reducer: handleReducer,
+    middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware().concat(),
+    devTools: composeWithDevTools({ trace: true }), 
 });
 
 export const actionCreators = {
